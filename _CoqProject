@@ -1,0 +1,11 @@
+-Q theories/ Grisette
+theories/SymBoolOp.v
+theories/CpdtTactics.v
+theories/GeneralTactics.v
+theories/Union.v
+theories/MergingStrategy.v
+theories/SubStrategy.v
+theories/Invariant.v
+theories/SubStrategyInvariant.v
+theories/Basic.v
+theories/Eval.v
