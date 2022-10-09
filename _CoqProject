@@ -9,3 +9,4 @@ theories/Invariant.v
 theories/SubStrategyInvariant.v
 theories/Basic.v
 theories/Eval.v
+theories/Progress.v

@@ -672,3 +672,242 @@ Section EvalTerms_ind'.
   Admitted.
 End EvalTerms_ind'.
 
+Definition all_in_et {T} P (et : EvalTerms T) : Prop :=
+  match et with
+  | EvalValue _ u => AllInUnion P u
+  | MrgIf _ _ t f => AllInUnion P t /\ AllInUnion P f
+  | SSMrgIf _ _ t f => AllInUnion P t /\ AllInUnion P f
+  | SIMrgIf _ _ t f => AllInUnion P t /\ AllInUnion P f
+  | ISMrgIf _ _ t f => AllInUnion P t /\ AllInUnion P f
+  | IIMrgIf _ _ t f => AllInUnion P t /\ AllInUnion P f
+  end.
+
+#[global] Hint Unfold all_in_et : eval.
+
+Lemma value_evaluate_to_value : forall {T n1 n2} {ms1 : MergingStrategy T n1}
+  {ms2 : MergingStrategy T n2} {u1 u2},
+  EvalValue ms1 u1 ==>* EvalValue ms2 u2 -> EvalValue ms1 u1 = EvalValue ms2 u2.
+Proof.
+  intros.
+  invcd H; auto.
+  invcd H0.
+Qed.
+
+Ltac invcd_eval_value :=
+  match goal with
+  | [ H: EvalValue ?ms1 ?r1 ==>* EvalValue ?ms2 ?r2 |- _] =>
+    apply value_evaluate_to_value in H; invcd H
+  end.
+
+#[global] Hint Resolve value_evaluate_to_value : eval.
+
+Ltac invcd_eval_rule H :=
+  invcd H; simpl in *; try solve [exfalso; auto].
+
+Theorem eval_do_not_change_index_subrt : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1} (b : bool),
+  ProperStrategy P (SortedStrategy n ind sub) ->
+  SubStrategyRT Psub P s (SortedStrategy n ind sub) ->
+  EvalTermsGood s t ->
+  (if b
+    then all_in_et (fun (x : T) => ind x = Some i) t
+    else all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t) ->
+  forall u, t ==>* (EvalValue s u) ->
+  (if b
+    then AllInUnion (fun (x : T) => ind x = Some i) u
+    else AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u).
+Proof.
+  intros.
+  assert (good:exists n1 (ms1 : MergingStrategy T n1), EvalTermsGood ms1 t) by (repeat eexists; eauto).
+  generalize dependent u.
+  generalize dependent ind.
+  generalize dependent sub.
+  generalize dependent Psub.
+  generalize dependent n1.
+  apply EvalTerms_ind' with (t := t); intros; try invcd_eval_value; subst; eauto.
+  { invcd H6. destruct b; simpl in *; invcd_eval_rule H7;
+    invcd_eval_value; intuition.
+  }
+  { clear t good.
+    invcd H3.
+    invcd H7. invcd_eval_rule H3.
+    repeat invcd_eval_value.
+    rewrite H14 in H0. invcd H0.
+    destruct b; simpl in *;
+    invcd H6; invcd H0; invcd H3;
+    eapply H1; clear H1; eauto; econstructor.
+    1,3: clear H5 H4 sub H2 H Psub; eauto with inv.
+    - invcd H5.
+      eapply proper_ms_subt_simple_t.
+      3: apply H14.
+      all: eauto.
+    - destruct H7 as [i1 ?].
+      invcd H5.
+      exists i1.
+      intuition.
+      eapply proper_ms_subt_simple_t.
+      3: apply H14.
+      all: eauto.
+  }
+  1-4: destruct b; simpl in *; destruct ms; simpl in H0; try solve [exfalso; auto];
+    invcd H2; invcd H5; invcd H6; invcd H5; try solve [exfalso; auto];
+    invcd_eval_value;
+    eapply H1; simpl; eauto;
+    econstructor; eauto; constructor; constructor; auto.
+  { destruct b; simpl in *; invcd H6; invcd H7; invcd H6; try solve_aiu;
+    invcd_eval_value;
+    solve_aiu.
+  }
+  { destruct b; simpl in *.
+    all: invcd H7; invcd H8; invcd H7; try solve_aiu.
+    all: invcd_eval_value.
+    all: assert (i0 = i1) by eauto with union.
+    all: subst.
+    all: rewrite H2 in H21; invcd H21.
+    all: clear H19 H20.
+    all: specialize (all_in_union_left_most' H0); simpl; intros.
+    all: invcd H4.
+    all: assert (ProperStrategy Psub (SortedStrategy n2 ind sub)) by eauto with sub.
+    all: assert (ProperStrategy P0 (SortedStrategy n2 ind sub)) by eauto with inv.
+    all: specialize (proper_ms_sub_from_subfunc H4 H7 H2) as [Psub' Hsub'].
+    all: eapply H3; simpl in *.
+    5,10: apply H22.
+    all: eauto.
+    1,3: specialize (proper_ms_sub_from_subfunc H8 H7 H2) as [Psub'' Hsub''];
+         econstructor; eapply hm_sub_hm; eauto.
+    all: eapply sub_subrt_subrt; eauto.
+  }
+  { destruct b; simpl in *; invcd H6; invcd H7; invcd H6; try solve_aiu.
+    all: invcd_eval_value.
+    all: solve_aiu.
+  }
+  { destruct b; simpl in *.
+    all: invcd H5.
+    all: invcd H6.
+    all: invcd H5.
+    1,5: invcd_eval_value;
+      eapply H1;[ | | | | apply H18];
+      simpl; eauto with eval union.
+    all: invcd H0;
+      specialize (all_in_union_left_most' H12); simpl; intros;
+      rewrite H19 in H0; invcd H0;
+      solve_aiu.
+  }
+  
+  1-3: destruct b; simpl in *; (invcd H6; clear H15 H21;
+    invcd H9; invcd H11;
+    invcd H10;
+    invcd H9; try solve_aiu; [
+      invcd H22;
+      specialize (all_in_union_left_most' H16); simpl; intros;
+      rewrite H9 in H2; invcd H2; solve_aiu
+    | invcd_eval_value]).
+
+  (* lt *)
+  1-2: eauto with union.
+
+  (* eq *)
+  1-2: assert (ti = ti0) by eauto with union; subst.
+  1-2: rewrite H4 in H28; invcd H28.
+  1-2: constructor; eauto.
+  1-2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) ft) by eauto with inv.
+  1-2: assert (ProperStrategy P0 (SortedStrategy n0 ind sub1)) by eauto with inv.
+  1-2: specialize (all_in_union_left_most' H25); simpl; intro.
+  1-2: assert (ProperStrategy Psub (SortedStrategy n0 ind sub1)) by eauto with sub.
+  1-2: specialize (all_in_union_left_most' H0); simpl; intros.
+  1-2: specialize (proper_ms_sub_from_subfunc H12 H14 H4) as [Psub' Hsub'].
+  1-2: eapply H5.
+  5,10: apply H29.
+  1-8: simpl; eauto.
+  1,3: specialize (proper_ms_sub_from_subfunc H10 H11 H4) as [Psub'' Hsub''];
+      econstructor; eapply hm_sub_hm; eauto.
+  1,2: eapply sub_subrt_subrt; eauto.
+
+  (* gt *)
+  1,2: assert (ti0 = ti) by eauto with union.
+  1,2: assert (fti0 = fti) by eauto with union.
+  1,2: subst.
+  1,2: rewrite H26 in H2; invcd H2.
+  1,2: constructor; eauto.
+  1,2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) ff) by eauto with inv.
+  1,2: eapply H5.
+  5,10: apply H29.
+  1-8: simpl; eauto.
+  1-2: econstructor; eauto.
+Admitted.
+
+Theorem eval_do_not_change_index_subrt_eq : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+  SubStrategyRT Psub P s (SortedStrategy n ind sub) ->
+  EvalTermsGood s t ->
+  all_in_et (fun (x : T) => ind x = Some i) t ->
+  forall u, t ==>* (EvalValue s u) ->
+  AllInUnion (fun (x : T) => ind x = Some i) u.
+Proof.
+  intros.
+  assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto with sub.
+  eapply (eval_do_not_change_index_subrt true); eauto.
+Qed.
+
+Theorem eval_do_not_change_index_subrt_lowerbound : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+  SubStrategyRT Psub P s (SortedStrategy n ind sub) ->
+  EvalTermsGood s t ->
+  all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t ->
+  forall u, t ==>* (EvalValue s u) ->
+  AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u.
+Proof.
+  intros.
+  assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto with sub.
+  eapply (eval_do_not_change_index_subrt false); eauto.
+Qed.
+
+Theorem eval_do_not_change_index_eq : forall {T n} {ind sub} {i t},
+  EvalTermsGood (SortedStrategy n ind sub) t ->
+  all_in_et (fun (x : T) => ind x = Some i) t ->
+  forall u, t ==>* (EvalValue (SortedStrategy n ind sub) u) ->
+  AllInUnion (fun (x : T) => ind x = Some i) u.
+Proof.
+  intros.
+  assert (exists P, ProperStrategy P (SortedStrategy n ind sub)) as [P ?] by eauto with eval.
+  eapply (eval_do_not_change_index_subrt_eq); eauto with sub.
+Qed.
+
+#[global] Hint Resolve eval_do_not_change_index_eq : eval.
+
+Theorem eval_do_not_change_index_sub_eq : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+  SubStrategy Psub P i s (SortedStrategy n ind sub) ->
+  EvalTermsGood s t ->
+  all_in_et (fun (x : T) => ind x = Some i) t ->
+  forall u, t ==>* (EvalValue s u) ->
+  AllInUnion (fun (x : T) => ind x = Some i) u.
+Proof.
+  intros.
+  eapply (eval_do_not_change_index_subrt_eq); eauto with sub.
+Qed.
+
+#[global] Hint Resolve eval_do_not_change_index_sub_eq : eval.
+
+Theorem eval_do_not_change_index_lowerbound : forall {T n} {ind sub} {i t},
+  EvalTermsGood (SortedStrategy n ind sub) t ->
+  all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t ->
+  forall u, (t : EvalTerms T) ==>* (EvalValue (SortedStrategy n ind sub) u) ->
+  AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u.
+Proof.
+  intros.
+  assert (exists P, ProperStrategy P (SortedStrategy n ind sub)) as [P ?] by eauto with eval.
+  eapply (eval_do_not_change_index_subrt_lowerbound); eauto with sub.
+Qed.
+
+#[global] Hint Resolve eval_do_not_change_index_lowerbound : eval.
+
+Theorem eval_do_not_change_index_sub_lowerbound : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+  ProperStrategy P (SortedStrategy n ind sub) ->
+  SubStrategy Psub P i s (SortedStrategy n ind sub) ->
+  EvalTermsGood s t ->
+  all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t ->
+  forall u, t ==>* (EvalValue s u) ->
+  AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u.
+Proof.
+  intros.
+  eapply (eval_do_not_change_index_subrt_lowerbound); eauto with sub.
+Qed.
+
+#[global] Hint Resolve eval_do_not_change_index_sub_lowerbound : eval.

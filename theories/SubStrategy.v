@@ -167,28 +167,52 @@ Qed.
 
 Theorem proper_ms_subt_simple : forall {T P0 P1} {n ind sub} {m},
   SubStrategyT P0 P1 (SimpleStrategy m) (SortedStrategy n ind sub) ->
+  forall {c} {t f : T} {r},
+  m c t f = Some r ->
+  exists i, ind t = Some i /\ ind f = Some i /\ ind r = Some i.
+Proof.
+  intros.
+  specialize (proper_ms_subt_ind H) as [z ?].
+  assert (ProperStrategy P0 (SimpleStrategy m)) by eauto with sub.
+  invcd H2.
+  unfold SimpleDefinedNoBeyond in H5.
+  assert (P0 t /\ P0 f) as [? ?].
+  { assert ((P0 t /\ P0 f) \/ ~(P0 t /\ P0 f)) by apply classic.
+    destruct H2; eauto.
+    apply not_and_or in H2.
+    specialize (H5 c _ _ H2).
+    rewrite H0 in H5. congruence.
+  }
+  specialize (H4 c _ _ H2 H3) as [r' [? ?]].
+  rewrite H4 in H0. invc H0.
+  exists z.
+  firstorder.
+Qed.
+
+Theorem proper_ms_subt_simple_t : forall {T P0 P1} {n ind sub} {m},
+  SubStrategyT P0 P1 (SimpleStrategy m) (SortedStrategy n ind sub) ->
   forall {c} {t f : T} {i r},
   ind t = Some i ->
+  m c t f = Some r ->
+  ind r = Some i.
+Proof.
+  intros.
+  specialize (proper_ms_subt_simple H H1) as [z [? [? ?]]].
+  rewrite H0 in H2. invc H2.
+  auto.
+Qed.
+
+Theorem proper_ms_subt_simple_f : forall {T P0 P1} {n ind sub} {m},
+  SubStrategyT P0 P1 (SimpleStrategy m) (SortedStrategy n ind sub) ->
+  forall {c} {t f : T} {i r},
   ind f = Some i ->
   m c t f = Some r ->
   ind r = Some i.
 Proof.
   intros.
-  specialize (proper_ms_subt_ind H) as [z ?].
-  assert (ProperStrategy P0 (SimpleStrategy m)) by eauto with sub.
-  invcd H4.
-  unfold SimpleDefinedNoBeyond in H7.
-  assert (P0 t /\ P0 f) as [? ?].
-  { assert ((P0 t /\ P0 f) \/ ~(P0 t /\ P0 f)) by apply classic.
-    destruct H4; eauto.
-    apply not_and_or in H4.
-    specialize (H7 c _ _ H4).
-    rewrite H2 in H7. congruence.
-  }
-  specialize (H6 c _ _ H4 H5) as [r' [? ?]].
-  rewrite H6 in H2. invc H2.
-  apply H3 in H4. apply H3 in H8.
-  rewrite H0 in H4. invcd H4. auto.
+  specialize (proper_ms_subt_simple H H1) as [z [? [? ?]]].
+  rewrite H0 in H3. invc H3.
+  auto.
 Qed.
 
 Inductive SubStrategyRT {T} {n1} P1 : forall {n}, (T -> Prop) -> MergingStrategy T n1 -> MergingStrategy T n -> Prop := 
@@ -196,6 +220,15 @@ Inductive SubStrategyRT {T} {n1} P1 : forall {n}, (T -> Prop) -> MergingStrategy
   | Subrt_trans : forall {n P2} {sub : MergingStrategy T n1} {ms : MergingStrategy T n}, SubStrategyT P1 P2 sub ms -> SubStrategyRT P1 P2 sub ms.
 
 #[global] Hint Constructors SubStrategyRT : sub.
+
+Theorem subrt_proper_sub : forall {T n1} {P1 P2} {n2} {sub : MergingStrategy T n1} {ms : MergingStrategy T n2},
+  SubStrategyRT P1 P2 sub ms -> ProperStrategy P1 sub.
+Proof.
+  intros.
+  invcd H; eauto with sub.
+Qed.
+
+#[global] Hint Resolve subrt_proper_sub : sub.
 
 Theorem subrt_proper_sup : forall {T n1} {P1 P2} {n2} {sub : MergingStrategy T n1} {ms : MergingStrategy T n2},
   SubStrategyRT P1 P2 sub ms -> ProperStrategy P2 ms.
