@@ -111,9 +111,7 @@ Proof.
   (* SIEq *)
   { assert (SubUnion ft (If fc ft ff)) by eauto 3 with union.
     assert (ef0:HieraricalMergingInv P (SortedStrategy n ind sub) ft) by eauto 3 with inv.
-    inversiond ef; repeat aiu_simplify.
-    - specialize (all_in_union_left_most' H9); simpl; intro.
-      rewrite H2 in H12. invc H12. lia.
+    inversiond ef; repeat aiu_simplify; try solve_aiu.
     - rewrite H20 in H4. invcd H4.
       clear ev.
       specialize (hm_sub_st ev0 H1 H20 ef0) as [P1 ?].
@@ -144,9 +142,7 @@ Proof.
   }
   (* SIGt *)
   { assert (SubUnion ft (If fc ft ff)) by eauto 3 with union.
-    inversiond ef; repeat aiu_simplify.
-    - specialize (all_in_union_left_most' H9); simpl; intro.
-      rewrite H2 in H12. invc H12. lia.
+    inversiond ef; repeat aiu_simplify; try solve_aiu.
     - assert (EvalTermsGood (SortedStrategy n ind sub) (MrgIf (SortedStrategy n ind sub) c t0 ff)).
       { econstructor; eauto 3 with inv. }
       specialize (H5 _ _ H12) as [u [H5 H5']].
@@ -192,7 +188,6 @@ Proof.
       eapply eval_do_not_change_index_lowerbound; eauto 2 with eval.
       simpl. intuition; eauto 3 with union.
       invcd et; try solve_aiu.
-      repeat aiu_simplify. assert (z = tfi) by eauto with union. lia.
   }
   (* ISEq *)
   { assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto 2 with inv.
@@ -213,7 +208,6 @@ Proof.
       + eapply hm_both_sup_p; eauto.
       + eapply eval_do_not_change_index_sub_eq; simpl; eauto; intuition; eauto.
       + invcd et; try solve_aiu.
-        repeat aiu_simplify. assert (z = tfi) by eauto 4 with union. lia.
   }
   (* ISGt *)
   { assert (EvalTermsGood (SortedStrategy n ind sub)
@@ -271,8 +265,7 @@ Proof.
     econstructor. eapply HMSortedI; eauto; repeat aiu_simplify; eauto 3 with inv.
     eapply eval_do_not_change_index_lowerbound; eauto 2 with eval.
     simpl. intuition; eauto 2 with union.
-    { invcd et; try solve_aiu.
-      repeat aiu_simplify. assert (z = tfi) by eauto with union. lia. }
+    { invcd et; try solve_aiu. }
 
     { eapply hm_lm_is_lowerbound; eauto.
       simpl. exact (all_in_union_left_most' H2). }
@@ -311,9 +304,7 @@ Proof.
     - eapply eval_do_not_change_index_lowerbound; eauto 2 with eval.
       simpl. intuition; eauto 2 with union.
       + invcd et; try solve_aiu.
-        repeat aiu_simplify. assert (z = tfi) by eauto 4 with union. lia.
       + invcd ef; try solve_aiu.
-        repeat aiu_simplify. assert (z = ffi) by eauto 4 with union. lia.
   }
 
   (* IIGt *)
@@ -343,7 +334,6 @@ Proof.
       simpl. exact (all_in_union_left_most' H0). 
 
     - invcd ef; try solve_aiu.
-      repeat aiu_simplify. assert (z = ffi) by eauto with union. lia.
   }
 Qed.
 

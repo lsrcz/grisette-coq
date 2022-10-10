@@ -286,10 +286,16 @@ Ltac aiu_simplify :=
       H2 : Some ?z' = ?ind (left_most ?u) |- _] =>
       let Hx := fresh "Hx" in
       specialize (all_in_union_same_left_most' H1 H2) as Hx; subst; try clear Hx; clear H2
+  | [ H1 : AllInUnion (fun x => ?ind x = Some ?z) ?u,
+      H2 : ?ind (left_most ?u) = Some ?z' |- _] =>
+      let Hx := fresh "Hx" in
+      symmetry in H2;
+      specialize (all_in_union_same_left_most' H1 H2) as Hx; subst; try clear Hx; clear H2
   | [H1 : AllInUnion (fun x => ?ind x = Some ?z) ?u,
      H2 : AllInUnion (fun x => ?ind x = Some ?z') ?u |- _] =>
      let Hx := fresh "Hx" in
      assert (Hx:z=z') by (apply (all_in_union_two_inds H1 H2)); subst; try clear Hx; try clear H2
+  | [H : AllInUnion ?P (If ?c ?t ?f) |- _] => invcd H
   end.
 
 Ltac aiu_imply :=
@@ -417,10 +423,9 @@ Lemma all_in_union_lower_bound : forall {T} {ind : T -> option Z} {u : Union T} 
   AllInUnion (fun x : T => exists z, ind x = Some z /\ (z > il)%Z) u.
 Proof.
   intros.
-  induction u; repeat aiu_simplify.
-  - invc H. constructor. exists i. intuition. lia.
-  - invc H. intuition.
-  - invc H. intuition.
+  induction u; repeat aiu_simplify; auto.
+  invcd H.
+  constructor. exists i. intuition. lia.
 Qed.
 
 #[global] Hint Resolve all_in_union_lower_bound : union.
@@ -431,10 +436,8 @@ Lemma all_in_union_lower_bound' : forall {T} {ind : T -> option Z} {u : Union T}
   AllInUnion (fun x : T => exists z, ind x = Some z /\ (z > il)%Z) u.
 Proof.
   intros.
-  induction u; repeat aiu_simplify.
-  - invc H. destruct H2 as [? ?]. constructor. exists x. intuition. lia.
-  - invc H. intuition.
-  - invc H. intuition.
+  induction u; repeat aiu_simplify; auto.
+  invc H. destruct H2 as [? ?]. constructor. exists x. intuition. lia.
 Qed.
 
 #[global] Hint Resolve all_in_union_lower_bound' : union.

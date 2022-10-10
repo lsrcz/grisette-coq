@@ -10,3 +10,4 @@ theories/SubStrategyInvariant.v
 theories/Basic.v
 theories/Eval.v
 theories/Terminate.v
+theories/Deterministic.v

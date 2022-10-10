@@ -175,17 +175,14 @@ Proof.
     specialize (proper_ms_same_set H H2).
     intros.
     rewrite <- H7. auto.
-  - repeat aiu_simplify. assert (z = z0) by eauto with union. 
-    subst.
+  - repeat aiu_simplify.
     invcd H1.
-    rewrite H20 in H9. invcd H9.
+    rewrite H19 in H9. invcd H9.
     assert (ProperStrategy Ps s) by eauto with inv.
-    specialize (proper_ms_same_set H1 H2).
+    specialize (proper_ms_same_set H0 H2).
     intros.
-    specialize (hm_same_set' H11 H6). auto.
-  - repeat aiu_simplify. assert (z = z0) by eauto with union. 
-    subst.
-    invcd H0.
+    specialize (hm_same_set' H11 H1). auto.
+  - repeat aiu_simplify.
     specialize (all_in_union_left_most' H14).
     specialize (all_in_union_left_most' H3).
     simpl.
