@@ -157,28 +157,28 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     ~ IsConc c ->
     is_single t ->
     is_single f ->
-    clos_refl_trans_1n _ EvalRule (SSMrgIf s c t f) (EvalValue s r) ->
+    EvalRule (SSMrgIf s c t f) (EvalValue s r) ->
     EvalRule (MrgIf s c t f) (EvalValue s r)
   | MrgIfSortedSI : forall {n} (s : MergingStrategy T n) c t f r,
     is_sorted_strategy s ->
     ~ IsConc c ->
     is_single t ->
     is_if f ->
-    clos_refl_trans_1n _ EvalRule (SIMrgIf s c t f) (EvalValue s r) ->
+    EvalRule (SIMrgIf s c t f) (EvalValue s r) ->
     EvalRule (MrgIf s c t f) (EvalValue s r)
   | MrgIfSortedIS : forall {n} (s : MergingStrategy T n) c t f r,
     is_sorted_strategy s ->
     ~ IsConc c ->
     is_if t ->
     is_single f ->
-    clos_refl_trans_1n _ EvalRule (ISMrgIf s c t f) (EvalValue s r) ->
+    EvalRule (ISMrgIf s c t f) (EvalValue s r) ->
     EvalRule (MrgIf s c t f) (EvalValue s r)
   | MrgIfSortedII : forall {n} (s : MergingStrategy T n) c t f r,
     is_sorted_strategy s ->
     ~ IsConc c ->
     is_if t ->
     is_if f ->
-    clos_refl_trans_1n _ EvalRule (IIMrgIf s c t f) (EvalValue s r) ->
+    EvalRule (IIMrgIf s c t f) (EvalValue s r) ->
     EvalRule (MrgIf s c t f) (EvalValue s r)
   | SSLt : forall {n} ind sub c t f ti fi,
     AllInUnion (fun x => ind x = Some ti) t ->
@@ -189,7 +189,7 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     AllInUnion (fun x => ind x = Some i) t ->
     AllInUnion (fun x => ind x = Some i) f ->
     sub i = Some (MSSubLt s ev) ->
-    clos_refl_trans_1n _ EvalRule (MrgIf s c t f) (EvalValue s r) ->
+    EvalRule (MrgIf s c t f) (EvalValue s r) ->
     EvalRule (SSMrgIf (SortedStrategy n ind sub) c t f) (EvalValue (SortedStrategy n ind sub) r)
   | SSGt : forall {n} ind sub c t f ti fi,
     AllInUnion (fun x => ind x = Some ti) t ->
@@ -198,7 +198,7 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     EvalRule (SSMrgIf (SortedStrategy n ind sub) c t f) (EvalValue (SortedStrategy n ind sub) (If (pnegsb c) f t))
   | SIDeg : forall {n} ind sub c t f fi r,
     AllInUnion (fun x => ind x = Some fi) f ->
-    clos_refl_trans_1n _ EvalRule (SSMrgIf (SortedStrategy n ind sub) c t f) (EvalValue (SortedStrategy n ind sub) r) ->
+    EvalRule (SSMrgIf (SortedStrategy n ind sub) c t f) (EvalValue (SortedStrategy n ind sub) r) ->
     EvalRule (SIMrgIf (SortedStrategy n ind sub) c t f) (EvalValue (SortedStrategy n ind sub) r)
   | SILt : forall {n} ind sub c t fc ft ff ti fti ffi,
     AllInUnion (fun x => ind x = Some ti) t ->
@@ -214,7 +214,7 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     ind (left_most ff) = Some ffi ->
     (ti <> ffi)%Z ->
     sub ti = Some (MSSubLt s ev) ->
-    clos_refl_trans_1n _ EvalRule (MrgIf s c t ft) (EvalValue s t') ->
+    EvalRule (MrgIf s c t ft) (EvalValue s t') ->
     EvalRule (SIMrgIf (SortedStrategy n ind sub) c t (If fc ft ff))
              (EvalValue (SortedStrategy n ind sub) (If (porsb c fc) t' ff))
   | SIGt : forall {n} ind sub c t fc ft ff ti fti ffi f',
@@ -223,12 +223,12 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     ind (left_most ff) = Some ffi ->
     (fti <> ffi)%Z ->
     (ti > fti)%Z ->
-    clos_refl_trans_1n _ EvalRule (MrgIf (SortedStrategy n ind sub) c t ff) (EvalValue (SortedStrategy n ind sub) f') ->
+    EvalRule (MrgIf (SortedStrategy n ind sub) c t ff) (EvalValue (SortedStrategy n ind sub) f') ->
     EvalRule (SIMrgIf (SortedStrategy n ind sub) c t (If fc ft ff))
              (EvalValue (SortedStrategy n ind sub) (If (pandsb (pnegsb c) fc) ft f'))
   | ISDeg : forall {n} ind sub c t f ti r,
     AllInUnion (fun x => ind x = Some ti) t ->
-    clos_refl_trans_1n _ EvalRule (SSMrgIf (SortedStrategy n ind sub) c t f) (EvalValue (SortedStrategy n ind sub) r) ->
+    EvalRule (SSMrgIf (SortedStrategy n ind sub) c t f) (EvalValue (SortedStrategy n ind sub) r) ->
     EvalRule (ISMrgIf (SortedStrategy n ind sub) c t f) (EvalValue (SortedStrategy n ind sub) r)
   | ISLt : forall {n} ind sub c tc tt tf f tti tfi fi f',
     AllInUnion (fun x => ind x = Some tti) tt ->
@@ -236,7 +236,7 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     ind (left_most tf) = Some tfi ->
     (tti <> tfi)%Z ->
     (tti < fi)%Z ->
-    clos_refl_trans_1n _ EvalRule (MrgIf (SortedStrategy n ind sub) c tf f) (EvalValue (SortedStrategy n ind sub) f') ->
+    EvalRule (MrgIf (SortedStrategy n ind sub) c tf f) (EvalValue (SortedStrategy n ind sub) f') ->
     EvalRule (ISMrgIf (SortedStrategy n ind sub) c (If tc tt tf) f)
              (EvalValue (SortedStrategy n ind sub) (If (pandsb c tc) tt f'))
   | ISEq : forall {n} ind sub c tc tt tf f tfi fi n1 s t' (ev : n1 < n),
@@ -245,7 +245,7 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     ind (left_most tf) = Some tfi ->
     (tfi <> fi)%Z ->
     sub fi = Some (MSSubLt s ev) ->
-    clos_refl_trans_1n _ EvalRule (MrgIf s c tt f) (EvalValue s t') ->
+    EvalRule (MrgIf s c tt f) (EvalValue s t') ->
     EvalRule (ISMrgIf (SortedStrategy n ind sub) c (If tc tt tf) f)
              (EvalValue (SortedStrategy n ind sub) (If (porsb (pnegsb c) tc) t' tf))
   | ISGt : forall {n} ind sub c tc tt tf f tti tfi fi,
@@ -258,7 +258,7 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
              (EvalValue (SortedStrategy n ind sub) (If (pnegsb c) f (If tc tt tf)))
   | IIDeg1 : forall {n} ind sub c t f ti r,
     AllInUnion (fun x => ind x = Some ti) t ->
-    clos_refl_trans_1n _ EvalRule (SIMrgIf (SortedStrategy n ind sub) c t f)
+    EvalRule (SIMrgIf (SortedStrategy n ind sub) c t f)
                                   (EvalValue (SortedStrategy n ind sub) r) ->
     EvalRule (IIMrgIf (SortedStrategy n ind sub) c t f)
              (EvalValue (SortedStrategy n ind sub) r)
@@ -267,7 +267,7 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     AllInUnion (fun x => ind x = Some fi) f ->
     ind (left_most tf) = Some tfi ->
     (tti <> tfi)%Z ->
-    clos_refl_trans_1n _ EvalRule (ISMrgIf (SortedStrategy n ind sub) c (If tc tt tf) f)
+    EvalRule (ISMrgIf (SortedStrategy n ind sub) c (If tc tt tf) f)
                                   (EvalValue (SortedStrategy n ind sub) r) ->
     EvalRule (IIMrgIf (SortedStrategy n ind sub) c (If tc tt tf) f)
              (EvalValue (SortedStrategy n ind sub) r)
@@ -279,7 +279,7 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     (tti <> tfi)%Z ->
     (fti <> ffi)%Z ->
     (tti < fti)%Z ->
-    clos_refl_trans_1n _ EvalRule (MrgIf (SortedStrategy n ind sub) c tf (If fc ft ff))
+    EvalRule (MrgIf (SortedStrategy n ind sub) c tf (If fc ft ff))
                                   (EvalValue (SortedStrategy n ind sub) f') ->
     EvalRule (IIMrgIf (SortedStrategy n ind sub) c (If tc tt tf) (If fc ft ff))
              (EvalValue (SortedStrategy n ind sub) (If (pandsb c tc) tt f'))
@@ -291,8 +291,8 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     (fti <> tfi)%Z ->
     (fti <> ffi)%Z ->
     sub fti = Some (MSSubLt s ev) ->
-    clos_refl_trans_1n _ EvalRule (MrgIf s c tt ft) (EvalValue s t') ->
-    clos_refl_trans_1n _ EvalRule (MrgIf (SortedStrategy n ind sub) c tf ff)
+    EvalRule (MrgIf s c tt ft) (EvalValue s t') ->
+    EvalRule (MrgIf (SortedStrategy n ind sub) c tf ff)
                                   (EvalValue (SortedStrategy n ind sub) f') ->
     EvalRule (IIMrgIf (SortedStrategy n ind sub) c (If tc tt tf) (If fc ft ff))
              (EvalValue (SortedStrategy n ind sub) (If (pitesb c tc fc) t' f'))
@@ -304,18 +304,14 @@ Inductive EvalRule {T} : EvalTerms T -> EvalTerms T -> Prop :=
     (tti <> tfi)%Z ->
     (fti <> ffi)%Z ->
     (tti > fti)%Z ->
-    clos_refl_trans_1n _ EvalRule (MrgIf (SortedStrategy n ind sub) c (If tc tt tf) ff)
+    EvalRule (MrgIf (SortedStrategy n ind sub) c (If tc tt tf) ff)
                                   (EvalValue (SortedStrategy n ind sub) f') ->
     EvalRule (IIMrgIf (SortedStrategy n ind sub) c (If tc tt tf) (If fc ft ff))
              (EvalValue (SortedStrategy n ind sub) (If (pandsb (pnegsb c) fc) ft f')).
 
 #[global] Hint Constructors EvalRule : eval.
 
-Arguments clos_refl_trans_1n {A} _ _ _.
-#[global] Hint Constructors clos_refl_trans_1n : eval.
-
 Notation "t1 '==>' t2" := (EvalRule t1 t2) (at level 75).
-Notation "t1 '==>*' t2" := (clos_refl_trans_1n EvalRule t1 t2) (at level 75).
 
 Definition metric {T} (t : EvalTerms T) : nat :=
   match t with
@@ -1043,23 +1039,6 @@ Definition all_in_et {T} P (et : EvalTerms T) : Prop :=
 
 #[global] Hint Unfold all_in_et : eval.
 
-Lemma value_evaluate_to_value : forall {T n1 n2} {ms1 : MergingStrategy T n1}
-  {ms2 : MergingStrategy T n2} {u1 u2},
-  EvalValue ms1 u1 ==>* EvalValue ms2 u2 -> EvalValue ms1 u1 = EvalValue ms2 u2.
-Proof.
-  intros.
-  invcd H; auto.
-  invcd H0.
-Qed.
-
-Ltac invcd_eval_value :=
-  match goal with
-  | [ H: EvalValue ?ms1 ?r1 ==>* EvalValue ?ms2 ?r2 |- _] =>
-    apply value_evaluate_to_value in H; invcd H
-  end.
-
-#[global] Hint Resolve value_evaluate_to_value : eval.
-
 Ltac invcd_eval_rule H :=
   invcd H; simpl in *; try solve [exfalso; auto].
 
@@ -1075,6 +1054,98 @@ Proof.
   specialize (all_in_union_left_most' H7); simpl; intros.
   rewrite H0 in H2. invcd H2. solve_aiu.
 Qed.
+
+Arguments clos_refl_trans_1n {A}.
+#[global] Hint Constructors clos_refl_trans_1n : eval.
+
+Notation "t1 '==>*' t2" := (clos_refl_trans_1n EvalRule t1 t2) (at level 75).
+
+Lemma value_evaluate_to_value : forall {T n1} {ms1 : MergingStrategy T n1}
+  {u1} {t2},
+  EvalValue ms1 u1 ==>* t2 -> EvalValue ms1 u1 = t2.
+Proof.
+  intros.
+  invcd H; auto.
+  invcd H0.
+Qed.
+
+Ltac invcd_eval_value :=
+  match goal with
+  | [ H: EvalValue ?ms1 ?r1 ==>* ?t |- _] =>
+    apply value_evaluate_to_value in H; invcd H
+  end.
+
+#[global] Hint Resolve value_evaluate_to_value : eval.
+
+Lemma eval_star_is_eq_or_onestep : forall {T} {t1 t2 : EvalTerms T},
+  t1 ==>* t2 -> t1 = t2 \/ t1 ==> t2.
+Proof.
+  intros.
+  invcd H; eauto.
+  invcd H0; try invcd_eval_value; right; eauto with eval.
+Qed.
+
+#[global] Hint Resolve eval_star_is_eq_or_onestep : eval.
+
+Lemma eval_star_mrgif : forall {T n} {ms : MergingStrategy T n} c t f u,
+  MrgIf ms c t f ==>* EvalValue ms u ->
+  MrgIf ms c t f ==> EvalValue ms u.
+Proof.
+  intros.
+  specialize (eval_star_is_eq_or_onestep H).
+  intuition.
+  invcd H1.
+Qed.
+
+#[global] Hint Resolve eval_star_mrgif : eval.
+
+Lemma eval_star_ss : forall {T n} {ms : MergingStrategy T n} c t f u,
+  SSMrgIf ms c t f ==>* EvalValue ms u ->
+  SSMrgIf ms c t f ==> EvalValue ms u.
+Proof.
+  intros.
+  specialize (eval_star_is_eq_or_onestep H).
+  intuition.
+  invcd H1.
+Qed.
+
+#[global] Hint Resolve eval_star_ss : eval.
+
+Lemma eval_star_is : forall {T n} {ms : MergingStrategy T n} c t f u,
+  ISMrgIf ms c t f ==>* EvalValue ms u ->
+  ISMrgIf ms c t f ==> EvalValue ms u.
+Proof.
+  intros.
+  specialize (eval_star_is_eq_or_onestep H).
+  intuition.
+  invcd H1.
+Qed.
+
+#[global] Hint Resolve eval_star_is : eval.
+
+Lemma eval_star_si : forall {T n} {ms : MergingStrategy T n} c t f u,
+  SIMrgIf ms c t f ==>* EvalValue ms u ->
+  SIMrgIf ms c t f ==> EvalValue ms u.
+Proof.
+  intros.
+  specialize (eval_star_is_eq_or_onestep H).
+  intuition.
+  invcd H1.
+Qed.
+
+#[global] Hint Resolve eval_star_si : eval.
+
+Lemma eval_star_ii : forall {T n} {ms : MergingStrategy T n} c t f u,
+  IIMrgIf ms c t f ==>* EvalValue ms u ->
+  IIMrgIf ms c t f ==> EvalValue ms u.
+Proof.
+  intros.
+  specialize (eval_star_is_eq_or_onestep H).
+  intuition.
+  invcd H1.
+Qed.
+
+#[global] Hint Resolve eval_star_ii : eval.
 
 Theorem eval_do_not_change_index_subrt : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1} (b : bool),
   ProperStrategy P (SortedStrategy n ind sub) ->
@@ -1142,7 +1213,7 @@ Proof.
     all: assert (ProperStrategy P0 (SortedStrategy n2 ind sub)) by eauto with inv.
     all: specialize (proper_ms_sub_from_subfunc H4 H7 H2) as [Psub' Hsub'].
     all: eapply H3; simpl in *.
-    5,10: apply H22.
+    5,10: econstructor; [apply H22|constructor].
     all: eauto.
     1,3: specialize (proper_ms_sub_from_subfunc H8 H7 H2) as [Psub'' Hsub''];
          econstructor; eapply hm_sub_hm; eauto.
@@ -1159,7 +1230,7 @@ Proof.
     all: invcd H6.
     all: invcd H5.
     1,5: invcd_eval_value;
-      eapply H1;[ | | | | apply H18];
+      eapply H1;[ | | | | econstructor; [apply H18|constructor]];
       simpl; eauto with eval union.
     all: invcd H0;
       specialize (all_in_union_left_most' H12); simpl; intros;
@@ -1188,7 +1259,7 @@ Proof.
   1-2: specialize (all_in_union_left_most' H0); simpl; intros.
   1-2: specialize (proper_ms_sub_from_subfunc H12 H14 H4) as [Psub' Hsub'].
   1-2: eapply H5.
-  5,10: apply H29.
+  5,10: econstructor; [apply H29|constructor].
   1-8: simpl; eauto.
   1,3: specialize (proper_ms_sub_from_subfunc H10 H11 H4) as [Psub'' Hsub''];
       econstructor; eapply hm_sub_hm; eauto.
@@ -1197,7 +1268,7 @@ Proof.
   (* SIGt *)
   1,2: constructor; auto;
     eapply H5; intuition; eauto;
-    econstructor; eauto with inv.
+    econstructor; eauto with inv eval.
 
   (* ISDeg *)
   { destruct b; simpl in *.
@@ -1205,7 +1276,7 @@ Proof.
   all: invcd H6.
   all: invcd H5.
   1,5: invcd_eval_value;
-    eapply H1; [ | | | | apply H18];
+    eapply H1; [ | | | | econstructor; [apply H18|constructor]];
     simpl; eauto with eval union.
 
   all: invcd H0;
@@ -1222,7 +1293,7 @@ Proof.
   (* ISLt *)
   1-2: constructor; auto;
     eapply H5; intuition; eauto;
-    econstructor; eauto with inv.
+    econstructor; eauto with inv eval.
     
   (* ISEq *)
   1-2: assert (fi = fi0) by eauto with union; subst.
@@ -1235,7 +1306,7 @@ Proof.
   1-2: specialize (all_in_union_left_most' H0); simpl; intros.
   1-2: specialize (proper_ms_sub_from_subfunc H12 H14 H4) as [Psub' Hsub'].
   1-2: eapply H5.
-  5,10: apply H29.
+  5,10: econstructor; [apply H29|constructor].
   1-8: simpl; eauto.
   1,3: specialize (proper_ms_sub_from_subfunc H9 H10 H4) as [Psub'' Hsub''];
       econstructor; eapply hm_sub_hm; eauto.
@@ -1250,7 +1321,7 @@ Proof.
   all: invcd H6.
   all: invcd H5.
   1,6: invcd_eval_value;
-    eapply H1; [ | | | | apply H18];
+    eapply H1; [ | | | | econstructor; [apply H18|constructor]];
     simpl; eauto with eval union.
 
   all: invcd H0; specialize (all_in_union_left_most' H12); simpl; intros.
@@ -1266,7 +1337,7 @@ Proof.
   all: invcd H9.
   all: invcd H8.
   2,7: invcd_eval_value;
-    eapply H4; [ | | | | apply H26];
+    eapply H4; [ | | | | econstructor; [apply H26|constructor]];
     simpl; eauto with eval union.
 
   1,5: invcd H20; specialize (all_in_union_left_most' H15); simpl; intros;
@@ -1284,7 +1355,7 @@ Proof.
   (* IILt, IIGt *)
   1-4: constructor; auto;
     eapply H7; intuition; eauto;
-    econstructor; eauto with inv.
+    econstructor; eauto with inv eval.
 
   (* IIEq *)
   destruct b; simpl in *; (invcd H9; clear H18 H23 H24;
@@ -1293,7 +1364,7 @@ Proof.
 
 
   2,4: eapply H8; intuition; eauto;
-  econstructor; eauto with inv.
+  econstructor; eauto with inv eval.
 
   1-2: assert (fti = fti0) by eauto with union; subst.
   1-2: rewrite H6 in H35; invcd H35.
@@ -1305,14 +1376,14 @@ Proof.
   1-2: specialize (all_in_union_left_most' H31); simpl; intros.
   1-2: specialize (proper_ms_sub_from_subfunc H14 H17 H6) as [Psub' Hsub'].
   1-2: eapply H7.
-  5,10: apply H36.
+  5,10: econstructor; [apply H36|constructor].
   1-8: simpl; eauto.
   1,3: specialize (proper_ms_sub_from_subfunc H13 H17 H6) as [Psub'' Hsub''];
       econstructor; eapply hm_sub_hm; eauto.
   1,2: eapply sub_subrt_subrt; eauto.
 Qed.
 
-Theorem eval_do_not_change_index_subrt_eq : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+Theorem eval_do_not_change_index_subrt_eq' : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
   SubStrategyRT Psub P s (SortedStrategy n ind sub) ->
   EvalTermsGood s t ->
   all_in_et (fun (x : T) => ind x = Some i) t ->
@@ -1324,7 +1395,7 @@ Proof.
   eapply (eval_do_not_change_index_subrt true); eauto.
 Qed.
 
-Theorem eval_do_not_change_index_subrt_lowerbound : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+Theorem eval_do_not_change_index_subrt_lowerbound' : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
   SubStrategyRT Psub P s (SortedStrategy n ind sub) ->
   EvalTermsGood s t ->
   all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t ->
@@ -1336,7 +1407,7 @@ Proof.
   eapply (eval_do_not_change_index_subrt false); eauto.
 Qed.
 
-Theorem eval_do_not_change_index_eq : forall {T n} {ind sub} {i t},
+Theorem eval_do_not_change_index_eq' : forall {T n} {ind sub} {i t},
   EvalTermsGood (SortedStrategy n ind sub) t ->
   all_in_et (fun (x : T) => ind x = Some i) t ->
   forall u, t ==>* (EvalValue (SortedStrategy n ind sub) u) ->
@@ -1344,7 +1415,85 @@ Theorem eval_do_not_change_index_eq : forall {T n} {ind sub} {i t},
 Proof.
   intros.
   assert (exists P, ProperStrategy P (SortedStrategy n ind sub)) as [P ?] by eauto with eval.
-  eapply (eval_do_not_change_index_subrt_eq); eauto with sub.
+  eapply (eval_do_not_change_index_subrt_eq'); eauto with sub.
+Qed.
+
+#[global] Hint Resolve eval_do_not_change_index_eq' : eval.
+
+Theorem eval_do_not_change_index_sub_eq' : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+  SubStrategy Psub P i s (SortedStrategy n ind sub) ->
+  EvalTermsGood s t ->
+  all_in_et (fun (x : T) => ind x = Some i) t ->
+  forall u, t ==>* (EvalValue s u) ->
+  AllInUnion (fun (x : T) => ind x = Some i) u.
+Proof.
+  intros.
+  eapply (eval_do_not_change_index_subrt_eq'); eauto with sub.
+Qed.
+
+#[global] Hint Resolve eval_do_not_change_index_sub_eq' : eval.
+
+Theorem eval_do_not_change_index_lowerbound' : forall {T n} {ind sub} {i t},
+  EvalTermsGood (SortedStrategy n ind sub) t ->
+  all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t ->
+  forall u, (t : EvalTerms T) ==>* (EvalValue (SortedStrategy n ind sub) u) ->
+  AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u.
+Proof.
+  intros.
+  assert (exists P, ProperStrategy P (SortedStrategy n ind sub)) as [P ?] by eauto with eval.
+  eapply (eval_do_not_change_index_subrt_lowerbound'); eauto with sub.
+Qed.
+
+#[global] Hint Resolve eval_do_not_change_index_lowerbound' : eval.
+
+Theorem eval_do_not_change_index_sub_lowerbound' : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+  ProperStrategy P (SortedStrategy n ind sub) ->
+  SubStrategy Psub P i s (SortedStrategy n ind sub) ->
+  EvalTermsGood s t ->
+  all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t ->
+  forall u, t ==>* (EvalValue s u) ->
+  AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u.
+Proof.
+  intros.
+  eapply (eval_do_not_change_index_subrt_lowerbound'); eauto with sub.
+Qed.
+
+#[global] Hint Resolve eval_do_not_change_index_sub_lowerbound' : eval.
+
+
+Theorem eval_do_not_change_index_subrt_eq : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+  SubStrategyRT Psub P s (SortedStrategy n ind sub) ->
+  EvalTermsGood s t ->
+  all_in_et (fun (x : T) => ind x = Some i) t ->
+  forall u, t ==> (EvalValue s u) ->
+  AllInUnion (fun (x : T) => ind x = Some i) u.
+Proof.
+  intros.
+  assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto with sub.
+  eapply (eval_do_not_change_index_subrt true); eauto with eval.
+Qed.
+
+Theorem eval_do_not_change_index_subrt_lowerbound : forall {T n n1} {P ind sub} {i t} {Psub} {s : MergingStrategy T n1},
+  SubStrategyRT Psub P s (SortedStrategy n ind sub) ->
+  EvalTermsGood s t ->
+  all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t ->
+  forall u, t ==> (EvalValue s u) ->
+  AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u.
+Proof.
+  intros.
+  assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto with sub.
+  eapply (eval_do_not_change_index_subrt false); eauto with eval.
+Qed.
+
+Theorem eval_do_not_change_index_eq : forall {T n} {ind sub} {i t},
+  EvalTermsGood (SortedStrategy n ind sub) t ->
+  all_in_et (fun (x : T) => ind x = Some i) t ->
+  forall u, t ==> (EvalValue (SortedStrategy n ind sub) u) ->
+  AllInUnion (fun (x : T) => ind x = Some i) u.
+Proof.
+  intros.
+  assert (exists P, ProperStrategy P (SortedStrategy n ind sub)) as [P ?] by eauto with eval.
+  eapply (eval_do_not_change_index_subrt_eq); eauto with sub eval.
 Qed.
 
 #[global] Hint Resolve eval_do_not_change_index_eq : eval.
@@ -1353,11 +1502,11 @@ Theorem eval_do_not_change_index_sub_eq : forall {T n n1} {P ind sub} {i t} {Psu
   SubStrategy Psub P i s (SortedStrategy n ind sub) ->
   EvalTermsGood s t ->
   all_in_et (fun (x : T) => ind x = Some i) t ->
-  forall u, t ==>* (EvalValue s u) ->
+  forall u, t ==> (EvalValue s u) ->
   AllInUnion (fun (x : T) => ind x = Some i) u.
 Proof.
   intros.
-  eapply (eval_do_not_change_index_subrt_eq); eauto with sub.
+  eapply (eval_do_not_change_index_subrt_eq); eauto with sub eval.
 Qed.
 
 #[global] Hint Resolve eval_do_not_change_index_sub_eq : eval.
@@ -1365,12 +1514,12 @@ Qed.
 Theorem eval_do_not_change_index_lowerbound : forall {T n} {ind sub} {i t},
   EvalTermsGood (SortedStrategy n ind sub) t ->
   all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t ->
-  forall u, (t : EvalTerms T) ==>* (EvalValue (SortedStrategy n ind sub) u) ->
+  forall u, (t : EvalTerms T) ==> (EvalValue (SortedStrategy n ind sub) u) ->
   AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u.
 Proof.
   intros.
   assert (exists P, ProperStrategy P (SortedStrategy n ind sub)) as [P ?] by eauto with eval.
-  eapply (eval_do_not_change_index_subrt_lowerbound); eauto with sub.
+  eapply (eval_do_not_change_index_subrt_lowerbound); eauto with sub eval.
 Qed.
 
 #[global] Hint Resolve eval_do_not_change_index_lowerbound : eval.
@@ -1380,11 +1529,11 @@ Theorem eval_do_not_change_index_sub_lowerbound : forall {T n n1} {P ind sub} {i
   SubStrategy Psub P i s (SortedStrategy n ind sub) ->
   EvalTermsGood s t ->
   all_in_et (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) t ->
-  forall u, t ==>* (EvalValue s u) ->
+  forall u, t ==> (EvalValue s u) ->
   AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u.
 Proof.
   intros.
-  eapply (eval_do_not_change_index_subrt_lowerbound); eauto with sub.
+  eapply (eval_do_not_change_index_subrt_lowerbound); eauto with sub eval.
 Qed.
 
 #[global] Hint Resolve eval_do_not_change_index_sub_lowerbound : eval.

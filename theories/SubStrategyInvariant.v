@@ -198,3 +198,15 @@ Proof.
 Qed.
 
 #[global] Hint Resolve hm_sub_hm : subinv.
+
+Lemma hm_both_sup_p : forall {T} {P Psub} {n nsub} {ms : MergingStrategy T n}
+  {mssub : MergingStrategy T nsub} {i} {u},
+  SubStrategy Psub P i mssub ms ->
+  HieraricalMergingInv Psub mssub u ->
+  AllInUnion P u.
+Proof.
+  intros.
+  induction u.
+  - invcd H0. constructor. eapply proper_ms_sub_p; eauto.
+  - constructor; eauto with inv. 
+Qed.
