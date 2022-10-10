@@ -302,6 +302,10 @@ Ltac aiu_imply :=
       specialize (all_in_union_same_left_most' H H'); intro; subst; apply H
     | [H' : ?ind (left_most u) = Some z' |- _] => symmetry in H'; aiu_imply
     end
+  | [ H1 : Some ?ti = ?ind (left_most ?u),
+      H2 : AllInUnion (fun x => AllInUnion (fun y => ?ind x = ?ind y) ?u) ?u |-
+      AllInUnion (fun x => ?ind x = Some ?ti) ?u] =>
+    eauto with union
   end.
 
 Lemma all_in_union_single_implies_all_in_union_nested :

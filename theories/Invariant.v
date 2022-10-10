@@ -179,6 +179,30 @@ Qed.
 
 #[global] Hint Resolve hm_sub_if_false : inv.
 
+Theorem hm_sub_if_true_all_eq : forall {T} {P : T -> Prop} {n} {ind sub} {c} {t f : Union T},
+  HieraricalMergingInv P (SortedStrategy n ind sub) (If c t f) ->
+  AllInUnion (fun x => AllInUnion (fun y => ind x = ind y) t) t.
+Proof.
+  intros.
+  invcd H.
+  - repeat aiu_simplify. eauto with union.
+  - repeat aiu_simplify. eauto with union.
+Qed.
+
+#[global] Hint Resolve hm_sub_if_true_all_eq : inv.
+
+Theorem hm_sub_if_true_eq_left_most : forall {T} {P : T -> Prop} {n} {ind sub} {c} {t f : Union T} {i},
+  Some i = ind (left_most t) ->
+  HieraricalMergingInv P (SortedStrategy n ind sub) (If c t f) ->
+  AllInUnion (fun x => ind x = Some i) t.
+Proof.
+  intros.
+  specialize (hm_sub_if_true_all_eq H0) as Hsub.
+  solve_aiu.
+Qed.
+
+#[global] Hint Resolve hm_sub_if_true_eq_left_most : inv.
+
 Lemma all_in_union_same_ind_exist : forall {T P n ind sub u},
   HieraricalMergingInv P (SortedStrategy n ind sub) u ->
   AllInUnion (fun x : T => AllInUnion (fun y : T => ind x = ind y) u) u ->
@@ -251,24 +275,20 @@ Qed.
 
 #[global] Hint Resolve all_in_union_same_ind_inexist : inv.
 
-Lemma all_in_union_nested_lm' : forall {T n P} {ind : T -> option Z} {sub} {u : Union T},
+Lemma hm_lm_ind_exist : forall {T n P} {ind : T -> option Z} {sub} {u : Union T},
   HieraricalMergingInv P (SortedStrategy n ind sub) u ->
-  AllInUnion (fun x : T => AllInUnion (fun y : T => ind x = ind y) u) u ->
   exists i, Some i = ind (left_most u).
 Proof.
   intros.
-  induction u.
-  - simpl in *. inversion H; subst; invc_existT.
-    inversion H4; subst; invc_existT.
-    apply H3 in H5. firstorder. exists x. auto.
+  induction u; simpl in *.
+  - invcd H. invcd H3. apply H1 in H4 as [z' [n' [s' [e' [H4 H4']]]]].
+    exists z'. auto.
   - assert (HieraricalMergingInv P (SortedStrategy n ind sub) u1) by eauto with union inv.
     assert (HieraricalMergingInv P (SortedStrategy n ind sub) u2) by eauto with union inv.
     intuition.
-    invc H; subst; invc_existT; 
-    repeat aiu_simplify; simpl; eauto with union.
 Qed.
 
-#[global] Hint Resolve all_in_union_nested_lm' : inv.
+#[global] Hint Resolve hm_lm_ind_exist : inv.
 
 Lemma hm_is_p : forall {T P n} {s : MergingStrategy T n} {u},
   HieraricalMergingInv P s u ->
