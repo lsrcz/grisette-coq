@@ -11,3 +11,4 @@ theories/Basic.v
 theories/Eval.v
 theories/Terminate.v
 theories/Deterministic.v
+theories/Bilinear.v

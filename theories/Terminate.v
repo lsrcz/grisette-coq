@@ -16,7 +16,7 @@ Create HintDb progress discriminated.
 
 Theorem terminate' : forall {T n t} {ms : MergingStrategy T n},
   EvalTermsGood ms t ->
-  (exists u, t ==>* (EvalValue ms u) /\ EvalTermsGood ms (EvalValue ms u)).
+  (exists u step, t ==>(step)* (EvalValue ms u) /\ EvalTermsGood ms (EvalValue ms u)).
 Proof.
   intros.
   assert (good:exists n1 (ms1 : MergingStrategy T n1), EvalTermsGood ms1 t) by (repeat eexists; eauto).
@@ -53,15 +53,14 @@ Proof.
   (* MrgIf dispatch *)
   1-4: specialize_sorted_ms;
     specialize_ih_mrgif_dispatch;
-    econstructor; eauto with eval.
+    exists ((x + 1) + 0); intuition; eapply EvalTrans; eauto with eval.
   (* SSLt *)
-  { exists (If c t0 f); eauto.
-    econstructor; econstructor; eauto with eval.
+  { exists (If c t0 f); exists (1 + 0); intuition; eauto with eval.
     assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto with inv.
     assert (exists n (s : MergingStrategy T n) ev, sub ti = Some (MSSubLt s ev))
       as [n' [s' [H5 H5']]] by eauto with strategy.
     specialize (hm_sub_st H5 H0 H5' et) as [P1 ?].
-    eapply HMSortedI; eauto 3 with inv strategy union.
+    econstructor. eapply HMSortedI; eauto 3 with inv strategy union.
   }
   (* SSEq *)
   { inversiond H4.
@@ -69,11 +68,12 @@ Proof.
     specialize (hm_sub_st ev H1 H2 ef) as [P2 ?].
     assert (HieraricalMergingInv P1 s f) by eauto 3 with inv.
     assert (EvalTermsGood s (MrgIf s c t0 f)) by (econstructor; eauto).
-    specialize (H3 _ _ H8) as [u [H8' H8'']].
-    assert (SSMrgIf (SortedStrategy n ind sub0) c t0 f ==>* EvalValue (SortedStrategy n ind sub0) u)
+    specialize (H3 _ _ H8) as [u [step [H8' H8'']]].
+    assert (SSMrgIf (SortedStrategy n ind sub0) c t0 f ==>((step + 1) + 0)* EvalValue (SortedStrategy n ind sub0) u)
       by (econstructor; eauto with eval).
     exists u.
-    intuition.
+    eexists.
+    intuition; eauto.
     invc H8''. assert (ProperStrategy P (SortedStrategy n ind sub0)) by eauto 3 with inv.
     assert (ProperStrategy P3 s) by eauto 3 with inv.
     specialize (all_in_union_left_most' H0); simpl; intros.
@@ -82,19 +82,19 @@ Proof.
     econstructor; eauto.
   }
   (* SSGt *)
-  { exists (If (pnegsb c) f t0); eauto.
-    econstructor; econstructor; eauto 3 with eval.
+  { exists (If (pnegsb c) f t0); exists (1 + 0); intuition; eauto 3 with eval.
     assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto 3 with inv.
     assert (exists n (s : MergingStrategy T n) ev, sub fi = Some (MSSubLt s ev))
       as [n' [s' [H5 H5']]] by eauto 3 with strategy.
     specialize (hm_sub_st H5 H1 H5' ef) as [P1 ?].
-    eapply HMSortedI; eauto 3 with inv strategy union.
+    econstructor; eapply HMSortedI; eauto 3 with inv strategy union.
   }
   (* SIDeg *)
   { assert (EvalTermsGood (SortedStrategy n ind sub) (SSMrgIf (SortedStrategy n ind sub) c t0 f)).
     { econstructor; eauto 3 with eval union. }
-    specialize (H1 _ _ H3) as [u [H3' H3'']].
+    specialize (H1 _ _ H3) as [u [step [H3' H3'']]].
     exists u.
+    eexists.
     intuition.
     econstructor; econstructor; eauto 2 with eval.
   }
@@ -103,6 +103,7 @@ Proof.
     { econstructor. eapply hm_if_no_deg; simpl; eauto 3 with inv.
       eapply (all_in_union_left_most' H1). }
     exists (If c t0 (If fc ft ff)).
+    eexists.
     intuition.
     econstructor.
     eapply SILt; eauto.
@@ -120,8 +121,9 @@ Proof.
       clear P2 H12.
       assert (EvalTermsGood s (MrgIf s c t0 ft)).
       { econstructor; eauto 3 with eval. }
-      specialize (H5 _ _ H12) as [u [H5' H5'']].
+      specialize (H5 _ _ H12) as [u [step [H5' H5'']]].
       exists (If (porsb c fc) u ff).
+      eexists.
       intuition.
       econstructor.
       eapply SIEq; eauto 3 with eval.
@@ -145,8 +147,9 @@ Proof.
     inversiond ef; repeat aiu_simplify; try solve_aiu.
     - assert (EvalTermsGood (SortedStrategy n ind sub) (MrgIf (SortedStrategy n ind sub) c t0 ff)).
       { econstructor; eauto 3 with inv. }
-      specialize (H5 _ _ H12) as [u [H5 H5']].
+      specialize (H5 _ _ H12) as [u [step [H5 H5']]].
       exists (If (pandsb (pnegsb c) fc) ft u).
+      eexists.
       intuition.
       { econstructor. eapply SIGt; eauto 3 with eval.
         constructor. 
@@ -164,15 +167,16 @@ Proof.
   (* ISDeg *)
   { assert (EvalTermsGood (SortedStrategy n ind sub) (SSMrgIf (SortedStrategy n ind sub) c t0 f)).
     { econstructor; eauto 3 with eval union. }
-    specialize (H1 _ _ H3) as [u [H3' H3'']].
+    specialize (H1 _ _ H3) as [u [step [H3' H3'']]].
     exists u.
+    eexists.
     intuition.
     econstructor; econstructor; eauto 2 with eval.
   }
   (* ISLt *)
   { assert (EvalTermsGood (SortedStrategy n ind sub) (MrgIf (SortedStrategy n ind sub) c tf f)).
     { econstructor; eauto 2 with eval union inv. }
-    specialize (H5 _ _ H7) as [f' [H5 H5']].
+    specialize (H5 _ _ H7) as [f' [step [H5 H5']]].
     invcd H5'.
     assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto 2 with inv.
     specialize (all_in_union_left_most' H0); simpl; intros.
@@ -181,6 +185,7 @@ Proof.
     assert (HieraricalMergingInv P (SortedStrategy n ind sub) tt) by eauto 2 with inv.
     assert (HieraricalMergingInv Psub s' tt) by eauto 2 with subinv.
     exists (If (pandsb c tc) tt f').
+    eexists.
     intuition.
     - econstructor. eapply ISLt; eauto 2 with eval. econstructor.
     - econstructor. eapply HMSortedI. 4: apply H12.
@@ -197,16 +202,17 @@ Proof.
     assert (HieraricalMergingInv Psub s tt) by eauto 2 with subinv.
     assert (EvalTermsGood s (MrgIf s c tt f)).
     { econstructor; eauto 2 with subinv. }
-    specialize (H5 _ _ H13) as [t' [H5 H5']].
+    specialize (H5 _ _ H13) as [t' [step [H5 H5']]].
     invcd H5'.
     assert (HieraricalMergingInv Psub s t') by eauto 3 with inv.
     exists (If (porsb (pnegsb c) tc) t' tf).
+    eexists.
     intuition.
     - econstructor. eapply ISEq; eauto 2 with eval. econstructor.
     - econstructor. eapply HMSortedI. 4: apply H4.
       all: repeat aiu_simplify; eauto. all: eauto 3 with inv.
       + eapply hm_both_sup_p; eauto.
-      + eapply eval_do_not_change_index_sub_eq; simpl; eauto; intuition; eauto.
+      + eapply eval_do_not_change_index_sub_eq; simpl; eauto; intuition; eauto with eval.
       + invcd et; try solve_aiu.
   }
   (* ISGt *)
@@ -216,8 +222,9 @@ Proof.
       exact (all_in_union_left_most' H0).
       lia.
     }
-    specialize (H5 _ _ H7) as [u [H5 H5']]. 
+    specialize (H5 _ _ H7) as [u [step [H5 H5']]]. 
     exists u.
+    eexists.
     invcd_eval_value.
     intuition.
     econstructor. eapply ISGt; eauto. constructor.
@@ -227,8 +234,9 @@ Proof.
   { assert (AllInUnion (fun x => AllInUnion (fun y => ind x = ind y) t0) t0) by eauto 2 with union.
     assert (EvalTermsGood (SortedStrategy n ind sub) (SIMrgIf (SortedStrategy n ind sub) c t0 f)).
     { eauto 2 with eval. }
-    specialize (H1 _ _ H4) as [u [H1 H1']].
+    specialize (H1 _ _ H4) as [u [step [H1 H1']]].
     exists u.
+    eexists.
     intuition.
     econstructor. eapply IIDeg1; eauto 2 with eval. constructor.
   }
@@ -237,8 +245,9 @@ Proof.
   { assert (AllInUnion (fun x => AllInUnion (fun y => ind x = ind y) f) f) by eauto 2 with union.
     assert (EvalTermsGood (SortedStrategy n ind sub) (ISMrgIf (SortedStrategy n ind sub) c (If tc tt tf) f)).
     { eauto 2 with eval. }
-    specialize (H4 _ _ H7) as [u [H4 H4']].
+    specialize (H4 _ _ H7) as [u [step [H4 H4']]].
     exists u.
+    eexists.
     intuition.
     econstructor. eapply IIDeg2; eauto 2 with eval. constructor.
   }
@@ -247,8 +256,9 @@ Proof.
   { assert (EvalTermsGood (SortedStrategy n ind sub)
                           (MrgIf (SortedStrategy n ind sub) c tf (If fc ft ff))).
     { econstructor; eauto 2 with eval union inv. }
-    specialize (H7 _ _ H9) as [f' [H7 H7']].
+    specialize (H7 _ _ H9) as [f' [step [H7 H7']]].
     exists (If (pandsb c tc) tt f').
+    eexists.
 
     intuition.
     econstructor. eapply IILt; eauto 2 with eval. constructor.
@@ -275,7 +285,7 @@ Proof.
   { assert (EvalTermsGood (SortedStrategy n ind sub)
                           (MrgIf (SortedStrategy n ind sub) c tf ff)).
     { econstructor; eauto 2 with eval union inv. }
-    specialize (H8 _ _ H10) as [f' [H8 H8']].
+    specialize (H8 _ _ H10) as [f' [step [H8 H8']]].
 
     assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto 2 with inv.
     specialize (all_in_union_left_most' H0); simpl; intros.
@@ -286,8 +296,9 @@ Proof.
     assert (HieraricalMergingInv Psub s ft) by eauto 2 with subinv.
     assert (EvalTermsGood s (MrgIf s c tt ft)).
     { econstructor; eauto 2 with subinv. }
-    specialize (H7 _ _ H21) as [t' [H7 H7']].
+    specialize (H7 _ _ H21) as [t' [step' [H7 H7']]].
     exists (If (pitesb c tc fc) t' f').
+    eexists.
 
     intuition.
     econstructor. eapply IIEq; eauto 2 with eval. constructor.
@@ -300,7 +311,7 @@ Proof.
     econstructor. eapply HMSortedI; eauto; repeat aiu_simplify; eauto 3 with inv.
 
     - eapply hm_both_sup_p; eauto.
-    - eapply eval_do_not_change_index_sub_eq; simpl; eauto; intuition; eauto.
+    - eapply eval_do_not_change_index_sub_eq; simpl; eauto; intuition; eauto with eval.
     - eapply eval_do_not_change_index_lowerbound; eauto 2 with eval.
       simpl. intuition; eauto 2 with union.
       + invcd et; try solve_aiu.
@@ -311,8 +322,9 @@ Proof.
   { assert (EvalTermsGood (SortedStrategy n ind sub)
                           (MrgIf (SortedStrategy n ind sub) c (If tc tt tf) ff)).
     { econstructor; eauto 2 with eval union inv. }
-    specialize (H7 _ _ H9) as [f' [H7 H7']].
+    specialize (H7 _ _ H9) as [f' [step [H7 H7']]].
     exists (If (pandsb (pnegsb c) fc) ft f').
+    eexists.
 
     assert (ProperStrategy P (SortedStrategy n ind sub)) by eauto 2 with inv.
     specialize (all_in_union_left_most' H2); simpl; intros.
@@ -346,14 +358,15 @@ Definition is_value {T} (v : EvalTerms T) : Prop :=
 Theorem terminate : forall {T n t} {ms : MergingStrategy T n},
   EvalTermsGood ms t ->
   ~is_value t ->
-  (exists u, t ==> (EvalValue ms u) /\ EvalTermsGood ms (EvalValue ms u)).
+  (exists u step, t ==>(step) (EvalValue ms u) /\ EvalTermsGood ms (EvalValue ms u)).
 Proof.
   intros.
-  specialize (terminate' H) as [u [? ?]].
+  specialize (terminate' H) as [u [step [? ?]]].
   specialize (eval_star_is_eq_or_onestep H1).
   intuition; subst.
   - exfalso; simpl in *; auto. 
   - exists u.
+    exists step.
     destruct t; intuition.
 Qed.
   

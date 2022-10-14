@@ -39,14 +39,29 @@ Fixpoint union_depth {T} (t : Union T) : nat :=
   | If _ t f => S (max (union_depth t) (union_depth f))
   end.
 
-Lemma union_depth_geq_1 : forall {T} {t : Union T},
-  union_depth t >= 1.
+Lemma union_depth_non_zero : forall {T} {t : Union T},
+  union_depth t > 0.
 Proof.
   intros.
   induction t; simpl; lia.
 Qed.
 
-#[global] Hint Resolve union_depth_geq_1 : union.
+#[global] Hint Resolve union_depth_non_zero : union.
+
+Fixpoint union_size {T} (t : Union T) : nat :=
+  match t with
+  | Single _ => 1
+  | If _ t f => union_size t + union_size f
+  end.
+
+Lemma union_size_non_zero : forall {T} {t : Union T},
+  union_size t > 0.
+Proof.
+  intros.
+  induction t; simpl; lia.
+Qed.
+
+#[global] Hint Resolve union_size_non_zero : union.
 
 Inductive AllInUnion {T} (P : T -> Prop) : Union T -> Prop :=
   | AIUSingle : forall {x}, P x -> AllInUnion P (Single x)

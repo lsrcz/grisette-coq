@@ -4,6 +4,7 @@ Require Import Grisette.Union.
 Require Import Coq.ZArith.BinInt.
 Require Import Program.
 Require Import Coq.Logic.Classical_Prop.
+Require Import Lia.
 
 Create HintDb strategy discriminated.
 
@@ -118,6 +119,17 @@ Inductive ProperStrategy {T} (P : T -> Prop) : forall {n}, MergingStrategy T n -
     (forall v z n1 (s : MergingStrategy T n1) evlt, ind v = Some z -> sub z = Some (MSSubLt s evlt) ->
       exists P', ProperStrategy P' s /\ P' v) ->
     ProperStrategy P (SortedStrategy n ind sub).
+
+Lemma proper_ms_depth : forall {T} {P} {n} {ind sub} {v : T},
+  ProperStrategy P (SortedStrategy n ind sub) -> P v -> n > 0.
+Proof.
+  intros.
+  invcd H.
+  apply H3 in H0 as [z' [n' [s' [evlt' [? ?]]]]].
+  lia.
+Qed.
+
+#[global] Hint Resolve proper_ms_depth : strategy.
 
 Theorem proper_ms_same_set : forall {T P1 P2 n} {s : MergingStrategy T n},
   ProperStrategy P1 s -> ProperStrategy P2 s -> (forall v, P1 v <-> P2 v).

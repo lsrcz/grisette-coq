@@ -358,3 +358,13 @@ Proof.
 Qed.
 
 #[global] Hint Resolve hm_simple_result : inv.
+
+Theorem hm_sorted_non_zero_depth : forall {T P} {n} {ind sub} {u : Union T},
+  HieraricalMergingInv P (SortedStrategy n ind sub) u ->
+  n > 0.
+Proof.
+  intros.
+  invcd H; eauto with strategy; lia.
+Qed.
+
+#[global] Hint Resolve hm_sorted_non_zero_depth : inv.
