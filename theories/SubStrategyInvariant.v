@@ -103,12 +103,12 @@ Proof.
   - constructor. inversiond H4. inversiond H0.
     assert (P t) by (eapply proper_ms_sub_p; eauto).
     intuition; eauto with inv strategy.
-    unfold SortedSubDefinedNoOverlap in H8.
+    unfold SortedSubDefinedNoOverlap in H7.
     apply H3 in H1 as [z' [n' [s' [evlt' [H1 H1']]]]].
-    specialize (H9 _ _ _ _ evlt' H1 H1') as [P' [H9 H9']].
-    specialize (H8 _ _ _ _ _ _ _ _ evlt' evlt _ _ H1 H11 H1' H12 (proper_ms_implies_defined_at H9) (proper_ms_implies_defined_at H13)).
+    specialize (H13 _ _ _ _ evlt' H1 H1') as [P' [H13 H13']].
+    specialize (H7 _ _ _ _ _ _ _ _ evlt' evlt _ _ H1 H11 H1' H12 (proper_ms_implies_defined_at H13) (proper_ms_implies_defined_at H10)).
     assert (exists v, P' v /\ Psub v) by (exists t; intuition).
-    apply H8 in H2.
+    apply H7 in H2.
     subst.
     auto.
   - assert (HieraricalMergingInv Psub mssub u1) by eauto with inv.
@@ -171,7 +171,7 @@ Proof.
     eauto with strategy.
     invcd H1.
     invcd H7.
-    specialize (H11 _ _ _ _ evlt H3 H15) as [P' [? ?]].
+    specialize (H12 _ _ _ _ evlt H3 H15) as [P' [? ?]].
     specialize (proper_ms_same_set H H2).
     intros.
     rewrite <- H7. auto.

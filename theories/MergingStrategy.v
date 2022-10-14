@@ -116,6 +116,7 @@ Inductive ProperStrategy {T} (P : T -> Prop) : forall {n}, MergingStrategy T n -
     SortedDefinedNoBeyond ind sub P ->
     SortedSubDefinedNoBeyond ind sub P ->
     SortedSubDefinedNoOverlap ind sub P ->
+    (exists v z n1 (s : MergingStrategy T n1) evlt', P v /\ ind v = Some z /\ sub z = Some (MSSubLt s evlt') /\ n = n1 + 1) ->
     (forall v z n1 (s : MergingStrategy T n1) evlt, ind v = Some z -> sub z = Some (MSSubLt s evlt) ->
       exists P', ProperStrategy P' s /\ P' v) ->
     ProperStrategy P (SortedStrategy n ind sub).
@@ -148,9 +149,9 @@ Proof.
     destruct H1 as [? [? [? [? ?]]]].
     assert (P2 v \/ ~ P2 v) by apply classic.
     intuition.
-    apply (H12 _) in H1.
+    apply (H13 _) in H1.
     congruence.
-  - apply H11 in H1.
+  - apply H12 in H1.
     destruct H1 as [? [? [? [? ?]]]].
     assert (P1 v \/ ~ P1 v) by apply classic.
     intuition.
@@ -176,7 +177,11 @@ Proof.
     + unfold SortedDefinedNoBeyond in *.
       intros. rewrite <- H0 in H1. exact (H3 v H1).
     + unfold SortedSubDefinedNoBeyond in *.
-      intros. specialize (H4 v z n1 s evlt P' H1 H6 H8 v' H9). firstorder.
+      intros. specialize (H4 v z n1 s evlt P' H1 H7 H9 v' H10). firstorder.
+    + destruct H6 as [v [z [n1 [s [evlt' [? [? [? ?]]]]]]]].
+      exists v, z, n1, s, evlt'.
+      intuition; auto.
+      rewrite H0 in H1. auto.
 Qed.
 
 #[global] Hint Resolve proper_ms_same_set' : strategy.
@@ -201,13 +206,13 @@ Proof.
   inversion H; subst; invc_existT.
   unfold SortedDefinedNoBeyond in *.
   unfold SortedSubDefinedNoOverlap in *.
-  assert (H11':=H11).
-  specialize (H11 _ _ _ _ evlt1 H0 H2) as [P1 [? ?]].
-  specialize (H11' _ _ _ _ evlt2 H1 H3) as [P2 [? ?]].
-  specialize (proper_ms_same_set H4 H9).
+  assert (H12':=H12).
+  specialize (H12 _ _ _ _ evlt1 H0 H2) as [P1 [? ?]].
+  specialize (H12' _ _ _ _ evlt2 H1 H3) as [P2 [? ?]].
+  specialize (proper_ms_same_set H4 H10).
   intros.
-  specialize (H10 _ _ _ _ _ _ _ _ evlt1 evlt2 P1 P2 H0 H1 H2 H3).
-  specialize (H10 (proper_ms_implies_defined_at H4) (proper_ms_implies_defined_at H9)).
+  specialize (H9 _ _ _ _ _ _ _ _ evlt1 evlt2 P1 P2 H0 H1 H2 H3).
+  specialize (H9 (proper_ms_implies_defined_at H4) (proper_ms_implies_defined_at H10)).
   assert (exists v : T, P1 v /\ P2 v) by (exists x1; firstorder).
   auto.
 Qed.

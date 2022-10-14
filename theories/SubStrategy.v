@@ -25,7 +25,7 @@ Theorem proper_ms_sub_from_subfunc : forall {T P n nsub} {ind sub} {mssub : Merg
 Proof.
   intros.
   inversiond H.
-  specialize (H9 _ _ _ _ ev H0 H1) as [P' [? ?]]. 
+  specialize (H10 _ _ _ _ ev H0 H1) as [P' [? ?]]. 
   exists P'.
   econstructor; eauto.
 Qed.
@@ -50,13 +50,13 @@ Proof.
   inversiond H4.
   assert (P1 x) by (eapply proper_ms_sub_p; eauto).
   specialize (H3 _ H1) as [z1 [n1 [s1 [evlt1 [H3 H3']]]]].
-  specialize (H9 _ _ _ _ evlt1 H3 H3') as [P' [H9 H9']].
+  specialize (H13 _ _ _ _ evlt1 H3 H3') as [P' [H13 H13']].
 
-  unfold SortedSubDefinedNoOverlap in H8.
-  specialize (H8 _ _ _ _ _ _ _ _ evlt evlt1 _ _ H11 H3 H12 H3'
-    (proper_ms_implies_defined_at H10) (proper_ms_implies_defined_at H9)).
+  unfold SortedSubDefinedNoOverlap in H7.
+  specialize (H7 _ _ _ _ _ _ _ _ evlt evlt1 _ _ H11 H3 H12 H3'
+    (proper_ms_implies_defined_at H10) (proper_ms_implies_defined_at H13)).
   assert (exists v, P0 v /\ P' v) by (exists x; auto).
-  apply H8 in H2.
+  apply H7 in H2.
   subst.
   intuition; auto.
   exists evlt; auto.

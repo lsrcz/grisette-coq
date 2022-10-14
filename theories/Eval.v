@@ -813,13 +813,13 @@ Section EvalTerms_ind'.
   Next Obligation.
     clear EvalTerms_ind'.
     clear H6.
-    assert (exists P, HieraricalMergingInv P s t) as [P1 H1] by (eapply hm_sub_st; eauto with inv union).
-    assert (exists P, HieraricalMergingInv P s f) as [P2 H2] by (eapply hm_sub_st; eauto with inv union).
-    econstructor. eauto with inv; try solve_is_conc.
-    eauto with inv.
+    assert (exists P, HieraricalMergingInv P s t) as [P1 H1] by (eapply hm_sub_st; eauto 2 with inv union).
+    assert (exists P, HieraricalMergingInv P s f) as [P2 H2] by (eapply hm_sub_st; eauto 2 with inv union).
+    econstructor. eauto 2 with inv; try solve_is_conc.
+    eauto 3 with inv.
   Defined.
   Next Obligation.
-    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto with inv.
+    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto 2 with inv.
     invcd H.
     unfold SortedDefinedNoBeyond in H3.
     assert (P0 (left_most t) \/ ~ P0 (left_most t)) by apply classic.
@@ -830,13 +830,13 @@ Section EvalTerms_ind'.
     - apply H3 in H0. congruence.
   Defined.
   Next Obligation.
-    assert (exists ti, Some ti = ind (left_most t)) as [ti ?] by eauto with inv.
-    assert (exists fi, Some fi = ind (left_most f)) as [fi ?] by eauto with inv.
+    assert (exists ti, Some ti = ind (left_most t)) as [ti ?] by eauto 2 with inv.
+    assert (exists fi, Some fi = ind (left_most f)) as [fi ?] by eauto 2 with inv.
     specialize (n ti fi).
     intuition.
   Defined.
   Next Obligation.
-    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto with inv.
+    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto 2 with inv.
     assert (AllInUnion (fun x => ind x = Some ti) t) by solve_aiu.
     symmetry in Heq_tis.
     econstructor; eauto.
@@ -851,12 +851,12 @@ Section EvalTerms_ind'.
     eapply hm_lm_is_lowerbound; eauto.
   Defined.
   Next Obligation.
-    econstructor; eauto.
-    assert (SubUnion ff (If fc ft ff)) by eauto with union.
-    eauto with inv.
+    econstructor; eauto 1.
+    assert (SubUnion ff (If fc ft ff)) by eauto 2 with union.
+    eauto 2 with inv.
   Defined.
   Next Obligation.
-    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto with inv.
+    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto 2 with inv.
     invcd H.
     unfold SortedDefinedNoBeyond in H3.
     assert (P0 (left_most t) \/ ~ P0 (left_most t)) by apply classic.
@@ -865,17 +865,17 @@ Section EvalTerms_ind'.
       rewrite <- Heq_tis in H0.
       invc H0.
       symmetry in Heq_ftis.
-      specialize (H8 _ _ _ _ evlt1 Heq_ftis H0') as [P' [H8 H8']].
+      specialize (H9 _ _ _ _ evlt1 Heq_ftis H0') as [P' [H9 H9']].
       symmetry in Heq_ftis.
-      assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto with inv.
-      assert (SubStrategy P' P0 z1 s1 (SortedStrategy wildcard'0 ind sub)) by eauto with sub.
+      assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto 2 with inv.
+      assert (SubStrategy P' P0 z1 s1 (SortedStrategy wildcard'0 ind sub)) by eauto 2 with sub.
       assert (AllInUnion (fun x => ind x = Some z1) t) by solve_aiu.
-      assert (AllInUnion (fun x => (AllInUnion (fun y => ind x = ind y) ft)) ft) by eauto with inv.
+      assert (AllInUnion (fun x => (AllInUnion (fun y => ind x = ind y) ft)) ft) by eauto 2 with inv.
       assert (AllInUnion (fun x => ind x = Some z1) ft) by solve_aiu.
-      assert (HieraricalMergingInv P0 (SortedStrategy wildcard'0 ind sub) ft) by eauto with inv.
+      assert (HieraricalMergingInv P0 (SortedStrategy wildcard'0 ind sub) ft) by eauto 2 with inv.
       rewrite <- Heq_anonymous in H0'.
       invcd H0'.
-      econstructor; eauto with subinv.
+      econstructor; eauto 2 with subinv.
     - apply H3 in H0. congruence.
   Defined.
   Next Obligation.
@@ -906,8 +906,8 @@ Section EvalTerms_ind'.
       rewrite <- Heq_ffis in H3. invc H3. lia.
   Defined.
   Next Obligation.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'2 ind sub) ft) by eauto with inv.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'2 ind sub) ff) by eauto with inv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'2 ind sub) ft) by eauto 2 with inv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'2 ind sub) ff) by eauto 2 with inv.
     specialize (hm_lm_ind_exist et) as [ti ?].
     specialize (hm_lm_ind_exist H) as [fti ?].
     specialize (hm_lm_ind_exist H0) as [ffi ?].
@@ -927,20 +927,20 @@ Section EvalTerms_ind'.
     solve_aiu.
   Defined.
   Next Obligation.
-    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto with inv.
+    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto 2 with inv.
     symmetry in Heq_fis.
     symmetry in Heq_anonymous.
     (*specialize (proper_ms_ind_some_is_sub_some H Heq_fis) as [n' [ev' [s' ?]]].*)
     specialize (proper_ms_sub_from_subfunc H Heq_fis Heq_anonymous) as [Psub ?].
-    assert (AllInUnion (fun x => ind x = Some fi) f) by eauto with union.
-    assert (AllInUnion (fun x => ind x = Some fi) ttu) by eauto with inv.
-    assert (HieraricalMergingInv Psub s f) by eauto with subinv.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'0 ind sub) ttu) by eauto with inv.
-    assert (HieraricalMergingInv Psub s ttu) by eauto with subinv.
+    assert (AllInUnion (fun x => ind x = Some fi) f) by eauto 2 with union.
+    assert (AllInUnion (fun x => ind x = Some fi) ttu) by eauto 2 with inv.
+    assert (HieraricalMergingInv Psub s f) by eauto 2 with subinv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'0 ind sub) ttu) by eauto 2 with inv.
+    assert (HieraricalMergingInv Psub s ttu) by eauto 2 with subinv.
     econstructor; eauto.
   Defined.
   Next Obligation.
-    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto with inv.
+    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto 2 with inv.
     symmetry in Heq_fis.
     specialize (proper_ms_ind_some_is_sub_some H Heq_fis) as [n' [ev' [s' ?]]].
     rewrite H0 in Heq_anonymous. congruence.
@@ -954,8 +954,8 @@ Section EvalTerms_ind'.
       invcd Heq_ttis. invcd Heq_tfis. lia.
   Defined.
   Next Obligation.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'2 ind sub) ttu) by eauto with inv.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'2 ind sub) tf) by eauto with inv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'2 ind sub) ttu) by eauto 2 with inv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'2 ind sub) tf) by eauto 2 with inv.
     specialize (hm_lm_ind_exist ef) as [fi ?].
     specialize (hm_lm_ind_exist H) as [tti ?].
     specialize (hm_lm_ind_exist H0) as [tfi ?].
@@ -965,29 +965,29 @@ Section EvalTerms_ind'.
 
   (* II *)
   Next Obligation.
-    econstructor; eauto with inv.
+    econstructor; eauto 2 with inv.
   Defined.
   Next Obligation.
-    econstructor; eauto with inv.
+    econstructor; eauto 2 with inv.
   Defined.
   Next Obligation.
-    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto with inv.
+    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto 2 with inv.
     symmetry in Heq_ttis.
     symmetry in Heq_anonymous.
     specialize (proper_ms_sub_from_subfunc H Heq_ttis Heq_anonymous) as [Psub ?].
-    assert (AllInUnion (fun x => ind x = Some fti) ft) by eauto with inv.
-    assert (AllInUnion (fun x => ind x = Some fti) ttu) by eauto with inv.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'0 ind sub) ft) by eauto with inv.
-    assert (HieraricalMergingInv Psub s ft) by eauto with subinv.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'0 ind sub) ttu) by eauto with inv.
-    assert (HieraricalMergingInv Psub s ttu) by eauto with subinv.
+    assert (AllInUnion (fun x => ind x = Some fti) ft) by eauto 2 with inv.
+    assert (AllInUnion (fun x => ind x = Some fti) ttu) by eauto 2 with inv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'0 ind sub) ft) by eauto 2 with inv.
+    assert (HieraricalMergingInv Psub s ft) by eauto 2 with subinv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'0 ind sub) ttu) by eauto 2 with inv.
+    assert (HieraricalMergingInv Psub s ttu) by eauto 2 with subinv.
     econstructor; eauto.
   Defined.
   Next Obligation.
-    econstructor; eauto with inv.
+    econstructor; eauto 2 with inv.
   Defined.
   Next Obligation.
-    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto with inv.
+    assert (ProperStrategy P0 (SortedStrategy wildcard'0 ind sub)) by eauto 2 with inv.
     symmetry in Heq_ftis.
     specialize (proper_ms_ind_some_is_sub_some H Heq_ftis) as [n' [ev' [s' ?]]].
     rewrite H0 in Heq_anonymous. congruence.
@@ -1009,10 +1009,10 @@ Section EvalTerms_ind'.
       invcd Heq_ttis. invcd Heq_tfis. lia.
   Defined.
   Next Obligation.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'3 ind sub) ttu) by eauto with inv.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'3 ind sub) tf) by eauto with inv.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'3 ind sub) ft) by eauto with inv.
-    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'3 ind sub) ff) by eauto with inv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'3 ind sub) ttu) by eauto 2 with inv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'3 ind sub) tf) by eauto 2 with inv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'3 ind sub) ft) by eauto 2 with inv.
+    assert (HieraricalMergingInv P0 (SortedStrategy wildcard'3 ind sub) ff) by eauto 2 with inv.
     specialize (hm_lm_ind_exist H) as [tti ?].
     specialize (hm_lm_ind_exist H0) as [tfi ?].
     specialize (hm_lm_ind_exist H1) as [fti ?].
@@ -1088,7 +1088,7 @@ Proof.
   invcd H; eauto.
   invcd H0; try invcd_eval_value; right;
   try rewrite <- plus_n_O;
-  eauto with eval. 
+  eauto 2 with eval. 
 Qed.
 
 #[global] Hint Resolve eval_star_is_eq_or_onestep : eval.
@@ -1166,14 +1166,14 @@ Theorem eval_do_not_change_index_subrt : forall {T n n1} {P ind sub} {i t} {Psub
     else AllInUnion (fun x => exists i1, ind x = Some i1 /\ (i1 > i)%Z) u).
 Proof.
   intros.
-  assert (good:exists n1 (ms1 : MergingStrategy T n1), EvalTermsGood ms1 t) by (repeat eexists; eauto).
+  assert (good:exists n1 (ms1 : MergingStrategy T n1), EvalTermsGood ms1 t) by (repeat eexists; eauto 1).
   generalize dependent u.
   generalize dependent ind.
   generalize dependent sub.
   generalize dependent Psub.
   generalize dependent n1.
   generalize dependent step.
-  apply EvalTerms_ind' with (t := t); intros; try invcd_eval_value; subst; eauto.
+  apply EvalTerms_ind' with (t := t); intros; try invcd_eval_value; subst; eauto 2.
   { invcd H6. destruct b; simpl in *; invcd_eval_rule H7;
     invcd_eval_value; intuition.
   }
@@ -1184,25 +1184,25 @@ Proof.
     rewrite H16 in H0. invcd H0.
     destruct b; simpl in *;
     invcd H6; invcd H0; invcd H3;
-    eapply H1; clear H1; eauto; econstructor.
-    1,3: clear H5 H4 sub H2 H Psub; eauto with inv.
+    eapply H1; clear H1; eauto 2; econstructor.
+    1,3: clear H5 H4 sub H2 H Psub; eauto 2 with inv.
     - invcd H5.
       eapply proper_ms_subt_simple_t.
       3: apply H16.
-      all: eauto.
+      all: eauto 1.
     - destruct H7 as [i1 ?].
       invcd H5.
       exists i1.
       intuition.
       eapply proper_ms_subt_simple_t.
       3: apply H16.
-      all: eauto.
+      all: eauto 1.
   }
-  1-4: destruct b; simpl in *; destruct ms; simpl in H0; try solve [exfalso; auto];
-    invcd H2; invcd H5; invcd H6; invcd H5; try solve [exfalso; auto];
+  1-4: destruct b; simpl in *; destruct ms; simpl in H0; try solve [exfalso; auto 1];
+    invcd H2; invcd H5; invcd H6; invcd H5; try solve [exfalso; auto 2];
     invcd_eval_value;
-    eapply H1; simpl; eauto;
-    econstructor; eauto; constructor; constructor; auto.
+    eapply H1; simpl; eauto 1;
+    econstructor; eauto 1; constructor; constructor; auto 1.
   { destruct b; simpl in *; invcd H6; invcd H7; invcd H6; try solve_aiu;
     invcd_eval_value;
     solve_aiu.
@@ -1210,21 +1210,21 @@ Proof.
   { destruct b; simpl in *.
     all: invcd H7; invcd H8; invcd H7; try solve_aiu.
     all: invcd_eval_value.
-    all: assert (i0 = i1) by eauto with union.
+    all: assert (i0 = i1) by eauto 2 with union.
     all: subst.
     all: rewrite H2 in H22; invcd H22.
     all: clear H20 H21.
     all: specialize (all_in_union_left_most' H0); simpl; intros.
     all: invcd H4.
-    all: assert (ProperStrategy Psub (SortedStrategy n2 ind sub)) by eauto with sub.
-    all: assert (ProperStrategy P0 (SortedStrategy n2 ind sub)) by eauto with inv.
+    all: assert (ProperStrategy Psub (SortedStrategy n2 ind sub)) by eauto 2 with sub.
+    all: assert (ProperStrategy P0 (SortedStrategy n2 ind sub)) by eauto 2 with inv.
     all: specialize (proper_ms_sub_from_subfunc H4 H7 H2) as [Psub' Hsub'].
     all: eapply H3; simpl in *.
     5,10: econstructor; [apply H23|constructor].
-    all: eauto.
+    all: eauto 2.
     1,3: specialize (proper_ms_sub_from_subfunc H8 H7 H2) as [Psub'' Hsub''];
-         econstructor; eapply hm_sub_hm; eauto.
-    all: eapply sub_subrt_subrt; eauto.
+         econstructor; eapply hm_sub_hm; eauto 2.
+    all: eapply sub_subrt_subrt; eauto 2.
   }
   { destruct b; simpl in *; invcd H6; invcd H7; invcd H6; try solve_aiu.
     all: invcd_eval_value.
@@ -1238,7 +1238,7 @@ Proof.
     all: invcd H5.
     1,5: invcd_eval_value;
       eapply H1;[ | | | | econstructor; [apply H19|constructor]];
-      simpl; eauto with eval union.
+      simpl; eauto 3 with eval union.
     all: invcd H0;
       specialize (all_in_union_left_most' H12); simpl; intros;
       rewrite H20 in H0; invcd H0;
@@ -1253,29 +1253,29 @@ Proof.
     try solve [exfalso; eauto 2 using all_in_union_if_contra]; invcd_eval_value.
 
   (* SILt *)
-  1-2: eauto with union.
+  1-2: eauto 3 with union.
 
   (* SIEq *)
   1-2: assert (ti = ti0) by eauto with union; subst.
   1-2: rewrite H4 in H29; invcd H29.
-  1-2: constructor; eauto.
-  1-2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) ft) by eauto with inv.
-  1-2: assert (ProperStrategy P0 (SortedStrategy n0 ind sub1)) by eauto with inv.
+  1-2: constructor; eauto 2.
+  1-2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) ft) by eauto 2 with inv.
+  1-2: assert (ProperStrategy P0 (SortedStrategy n0 ind sub1)) by eauto 2 with inv.
   1-2: specialize (all_in_union_left_most' H25); simpl; intro.
-  1-2: assert (ProperStrategy Psub (SortedStrategy n0 ind sub1)) by eauto with sub.
+  1-2: assert (ProperStrategy Psub (SortedStrategy n0 ind sub1)) by eauto 2 with sub.
   1-2: specialize (all_in_union_left_most' H0); simpl; intros.
   1-2: specialize (proper_ms_sub_from_subfunc H12 H14 H4) as [Psub' Hsub'].
   1-2: eapply H5.
   5,10: econstructor; [apply H30|constructor].
   1-8: simpl; eauto.
   1,3: specialize (proper_ms_sub_from_subfunc H10 H11 H4) as [Psub'' Hsub''];
-      econstructor; eapply hm_sub_hm; eauto.
-  1,2: eapply sub_subrt_subrt; eauto.
+      econstructor; eapply hm_sub_hm; eauto 2.
+  1,2: eapply sub_subrt_subrt; eauto 2.
 
   (* SIGt *)
   1,2: constructor; auto;
     eapply H5; intuition; eauto;
-    econstructor; eauto with inv eval.
+    econstructor; eauto 2 with inv eval.
 
   (* ISDeg *)
   { destruct b; simpl in *.
@@ -1284,7 +1284,7 @@ Proof.
   all: invcd H5.
   1,5: invcd_eval_value;
     eapply H1; [ | | | | econstructor; [apply H19|constructor]];
-    simpl; eauto with eval union.
+    simpl; eauto 3 with eval union.
 
   all: invcd H0;
     specialize (all_in_union_left_most' H12); simpl; intros;
@@ -1299,17 +1299,17 @@ Proof.
 
   (* ISLt *)
   1-2: constructor; auto;
-    eapply H5; intuition; eauto;
-    econstructor; eauto with inv eval.
+    eapply H5; intuition; eauto 2;
+    econstructor; eauto 2 with inv eval.
     
   (* ISEq *)
   1-2: assert (fi = fi0) by eauto with union; subst.
   1-2: rewrite H4 in H29; invcd H29.
-  1-2: constructor; eauto.
-  1-2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) tt) by eauto with inv.
-  1-2: assert (ProperStrategy P0 (SortedStrategy n0 ind sub1)) by eauto with inv.
+  1-2: constructor; eauto 2.
+  1-2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) tt) by eauto 2 with inv.
+  1-2: assert (ProperStrategy P0 (SortedStrategy n0 ind sub1)) by eauto 2 with inv.
   1-2: specialize (all_in_union_left_most' H25); simpl; intro.
-  1-2: assert (ProperStrategy Psub (SortedStrategy n0 ind sub1)) by eauto with sub.
+  1-2: assert (ProperStrategy Psub (SortedStrategy n0 ind sub1)) by eauto 2 with sub.
   1-2: specialize (all_in_union_left_most' H0); simpl; intros.
   1-2: specialize (proper_ms_sub_from_subfunc H12 H14 H4) as [Psub' Hsub'].
   1-2: eapply H5.
@@ -1320,7 +1320,7 @@ Proof.
   1,2: eapply sub_subrt_subrt; eauto.
 
   (* ISGt *)
-  1-2: eauto with union.
+  1-2: eauto 3 with union.
 
   (* IIDeg1 *)
   { destruct b; simpl in *.
@@ -1362,7 +1362,7 @@ Proof.
   (* IILt, IIGt *)
   1-4: constructor; auto;
     eapply H7; intuition; eauto;
-    econstructor; eauto with inv eval.
+    econstructor; eauto 2 with inv eval.
 
   (* IIEq *)
   destruct b; simpl in *; (invcd H9; clear H18 H23 H24;
@@ -1375,10 +1375,10 @@ Proof.
 
   1-2: assert (fti = fti0) by eauto with union; subst.
   1-2: rewrite H6 in H36; invcd H36.
-  1-2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) tt) by eauto with inv.
-  1-2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) ft) by eauto with inv.
-  1-2: assert (ProperStrategy P0 (SortedStrategy n0 ind sub1)) by eauto with inv.
-  1-2: assert (ProperStrategy Psub (SortedStrategy n0 ind sub1)) by eauto with sub.
+  1-2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) tt) by eauto 2 with inv.
+  1-2: assert (HieraricalMergingInv P0 (SortedStrategy n0 ind sub1) ft) by eauto 2 with inv.
+  1-2: assert (ProperStrategy P0 (SortedStrategy n0 ind sub1)) by eauto 2 with inv.
+  1-2: assert (ProperStrategy Psub (SortedStrategy n0 ind sub1)) by eauto 2 with sub.
   1-2: specialize (all_in_union_left_most' H30); simpl; intro.
   1-2: specialize (all_in_union_left_most' H32); simpl; intros.
   1-2: specialize (proper_ms_sub_from_subfunc H14 H17 H6) as [Psub' Hsub'].

@@ -54,7 +54,7 @@ Proof.
   inversion H1; subst; repeat invc_existT.
   - inversion H3; repeat invc_existT.
     inversion H. subst. intuition.
-    specialize (H11 _ _ _ _ evlt' H4 H0) as [P' [? ?]].
+    specialize (H12 _ _ _ _ evlt' H4 H0) as [P' [? ?]].
     exists P'.
     constructor; auto.
   - inversion H4; repeat invc_existT.
@@ -225,7 +225,8 @@ Proof.
         eauto with union.
   - inversion H; subst; repeat invc_existT.
     + inversion H3; subst; repeat invc_existT. apply H6 in H5.
-      firstorder. exists x. eauto with union.
+      destruct H5 as [z' [n' [s' [? [? ?]]]]].
+      exists z'. eauto with union.
     + exists z.
       constructor; aiu_imply.
     + specialize (lm_exist (If c t f)) as [lmi ?].
